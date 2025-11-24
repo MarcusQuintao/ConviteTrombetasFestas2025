@@ -60,6 +60,10 @@
              position: relative;
         }
         
+        /* Classe personalizada para a cor Amarelo Exata (#FFFF00) */
+        .text-custom-yellow {
+            color: #FFFF00 !important;
+        }
         /* Classes Tailwind padrão (text-2xl, etc.) em REM, mas a raiz (html font-size) será ajustada via JS */
         
     </style>
@@ -116,7 +120,7 @@
                         <span class="font-bold">Formato 9:16</span> <span class="text-sm text-gray-400">(Celular / Retrato)</span>
                     </button>
                 </div>
-                <div id="format-error" class="text-red-400 text-sm text-center hidden">
+                <div id="format-error" class="text-custom-yellow text-sm text-center hidden">
                     Por favor, selecione um formato antes de prosseguir.
                 </div>
             </div>
@@ -139,7 +143,7 @@
 
                     <!-- DADOS PERSONALIZADOS -->
                     <!-- Nome do Convidado (Dado 1 - Vermelho) -->
-                    <h2 class="text-2xl font-extrabold mb-2 text-red-400" id="display-guest-name">Olá, Convidado!</h2>
+                    <h2 class="text-2xl font-extrabold mb-2 text-custom-yellow" id="display-guest-name">Olá, Convidado!</h2>
 
                     <!-- Texto fixo: "Você e sua família são nossos convidados de honra para o:" -->
                     <p class="text-sm text-gray-300 mb-2">
@@ -166,7 +170,7 @@
                         <p class="mt-2 text-gray-400">Convidamos vocês para assistirem ao evento conosco no endereço:</p>
                         
                         <!-- Endereço e Cidade (Dados 2 e 3 - Vermelho) -->
-                        <p class="font-bold text-red-400" id="display-location">
+                        <p class="font-bold text-custom-yellow" id="display-location">
                             Av. General Mello, 85, Jd. Califórnia, Cuiabá - MT
                         </p>
                     </div>
@@ -407,7 +411,7 @@
                 
                 const message = document.createElement('p');
                 message.textContent = "Ocorreu um erro ao tentar gerar o download da imagem. Tente novamente mais tarde. Obrigado!";
-                message.className = "text-red-400 mt-2";
+                message.className = "text-custom-yellow mt-2";
                 previewScreen.appendChild(message);
                 
                 setTimeout(() => message.remove(), 5000); 
