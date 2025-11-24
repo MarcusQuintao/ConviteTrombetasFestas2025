@@ -14,7 +14,8 @@
             background-color: #0d1117; /* Fundo escuro */
             color: white;
         }
-        /* Estilo para a tela de visualização */
+
+        /* Estilo base para a tela de visualização */
         .preview-screen {
             background-size: cover;
             background-position: center;
@@ -22,10 +23,28 @@
             flex-direction: column;
             justify-content: flex-end; /* Conteúdo na parte inferior da tela */
             position: relative;
-            min-height: 100vh;
-            /* Transição suave para a mudança de imagem de fundo */
+            /* Garante que o contêiner nunca fique muito pequeno, mas se ajusta ao pai */
+            width: 100%; 
+            min-height: 400px;
             transition: background-image 0.5s ease-in-out; 
         }
+
+        /* Classe para forçar a proporção 16:9 */
+        .aspect-16-9 {
+            aspect-ratio: 16 / 9;
+        }
+
+        /* Classe para forçar a proporção 9:16 (retrato) */
+        .aspect-9-16 {
+            /* Mantém a proporção 9:16 */
+            aspect-ratio: 9 / 16;
+            /* Limita a altura para caber na tela, mantendo a proporção. */
+            max-height: 90vh; 
+            /* Limita a largura para simular um celular no desktop */
+            max-width: 400px; 
+            /* A altura é definida implicitamente pelo aspecto e max-height */
+        }
+
         .content-overlay {
             background-color: rgba(0, 0, 0, 0.6); /* Fundo semi-transparente para o texto */
             padding: 1.5rem;
@@ -51,19 +70,19 @@
                 <div>
                     <!-- CAMPO 1: Nome do Convidado -->
                     <label for="guest-name" class="block text-sm font-medium text-gray-300">1. Nome do Convidado</label>
-                    <input type="text" id="guest-name" placeholder="Ex: João Paulo"
+                    <input type="text" id="guest-name" placeholder="Ex: Olá, João Paulo!"
                            class="mt-1 block w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:ring-amber-500 focus:border-amber-500 transition duration-150">
                 </div>
                 <div>
                     <!-- CAMPO 2: Endereço da Igreja -->
                     <label for="church-address" class="block text-sm font-medium text-gray-300">2. Endereço da Igreja</label>
-                    <input type="text" id="church-address" placeholder="Ex: Av. General Mello, 85, Bairro Jd. Califórnia"
+                    <input type="text" id="church-address" placeholder="Ex: Av. General Mello, 85, Jd. Califórnia"
                            class="mt-1 block w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:ring-amber-500 focus:border-amber-500 transition duration-150">
                 </div>
                 <div>
                     <!-- CAMPO 3: Cidade da Igreja -->
                     <label for="church-city" class="block text-sm font-medium text-gray-300">3. Cidade da Igreja</label>
-                    <input type="text" id="church-city" placeholder="Ex: Cuiabá/MT"
+                    <input type="text" id="church-city" placeholder="Ex: Cuiabá - MT"
                            class="mt-1 block w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:ring-amber-500 focus:border-amber-500 transition duration-150">
                 </div>
                 <div>
@@ -100,7 +119,7 @@
         </div>
 
         <!-- TELA 2: Visualização do Convite Personalizado -->
-        <div id="preview-screen" class="hidden">
+        <div id="preview-screen" class="hidden flex justify-center"> <!-- Adicionado 'flex justify-center' para centralizar no modo 9:16 no desktop -->
             <div id="preview-container" class="preview-screen rounded-xl shadow-2xl relative">
                 
                 <!-- Overlay de Conteúdo Personalizado -->
@@ -130,11 +149,11 @@
                         <p id="display-time">Horário: <span class="font-semibold">17h (Horário de Brasília)</span></p>
                         
                         <!-- Linha fixa: "Convidamos vocês para assistirem ao evento conosco na:" -->
-                        <p class="mt-2 text-gray-400">Convidamos vocês para assistirem ao evento conosco no endereço:</p>
+                        <p class="mt-2 text-gray-400">Convidamos vocês para assistirem ao evento conosco na:</p>
                         
                         <!-- Endereço e Cidade (Dados 2 e 3 - Vermelho) -->
                         <p class="font-bold text-red-400" id="display-location">
-                            Av. General Mello, 85, Jd. Califórnia, Cuiabá/MT
+                            Av. General Mello, 85, Jd. Califórnia, Cuiabá - MT
                         </p>
                     </div>
                 </div>
@@ -156,10 +175,10 @@
         let selectedFormat = null;
         
         // --- CAMINHOS RELATIVOS DAS IMAGENS NO REPOSITÓRIO GITHUB ---
-        // AJUSTADO: As imagens estão no mesmo nível do index.html (não há pasta 'assets').
+        // As imagens estão no mesmo nível do index.html.
         const imageUrls = {
-            '16:9': './Convite 16-9.jpg', // Caminho atualizado para o mesmo diretório
-            '9:16': './Convite 9-16.jpg'  // Caminho atualizado para o mesmo diretório
+            '16:9': './Convite 16-9.jpg', 
+            '9:16': './Convite 9-16.jpg'  
         };
         
         // Elementos do DOM
@@ -192,19 +211,32 @@
         }
 
         /**
+         * Aplica as classes de proporção de tela no contêiner de preview.
+         * Remove todas as classes de proporção e aplica apenas a selecionada.
+         */
+        function applyAspectRatioClasses(format) {
+            previewContainer.classList.remove('aspect-16-9', 'aspect-9-16');
+            if (format === '16:9') {
+                previewContainer.classList.add('aspect-16-9');
+                // Garante que o 16:9 ocupe a largura máxima e ajuste a altura
+                previewContainer.classList.remove('max-w-md'); 
+                previewContainer.classList.add('max-w-4xl'); 
+            } else if (format === '9:16') {
+                previewContainer.classList.add('aspect-9-16');
+                // Aplica as classes de celular (largura estreita)
+                previewContainer.classList.add('max-w-md'); 
+                previewContainer.classList.remove('max-w-4xl');
+            }
+        }
+        
+        /**
          * Alterna a visibilidade para a tela de visualização do convite.
          */
         function showPreviewScreen() {
             formScreen.classList.add('hidden');
             previewScreen.classList.remove('hidden');
-            // Garante que a tela de preview use toda a altura da viewport no celular (formato 9:16)
-            if (selectedFormat === '9:16') {
-                previewContainer.classList.add('min-h-screen', 'w-full', 'max-w-md', 'mx-auto');
-                previewContainer.classList.remove('max-w-4xl');
-            } else {
-                previewContainer.classList.remove('min-h-screen', 'w-full', 'max-w-md', 'mx-auto');
-                previewContainer.classList.add('max-w-4xl');
-            }
+            // Aplica as classes de proporção antes de mostrar
+            applyAspectRatioClasses(selectedFormat);
         }
 
         /**
@@ -251,7 +283,8 @@
             let timeText;
             let isCustomTime = false;
 
-            if (localTime && localTime.toLowerCase() !== '17h') {
+            // Verifica se o valor é diferente de '17h' (case-insensitive) e não está vazio
+            if (localTime && localTime.replace(/\s/g, '').toLowerCase() !== '17h') {
                 timeText = `${localTime}`;
                 isCustomTime = true;
             } else {
@@ -260,12 +293,15 @@
 
             // Aplica o texto e a cor condicionalmente
             displayTime.innerHTML = `Horário: <span class="font-semibold">${timeText}</span>`;
+            
+            // Remove classes de cor antes de aplicar
+            displayTime.classList.remove('text-red-400', 'text-gray-200');
+
             if (isCustomTime) {
                 // Se for um horário personalizado, aplicamos a cor Vermelha
                 displayTime.classList.add('text-red-400');
             } else {
-                // Caso contrário, usamos a cor padrão (cinza/branco)
-                displayTime.classList.remove('text-red-400');
+                // Se for o horário padrão, a cor será herdada (cinza/branco)
             }
             
             // 3. Aplica a Imagem de Fundo
