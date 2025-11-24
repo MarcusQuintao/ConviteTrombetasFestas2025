@@ -23,6 +23,8 @@
             justify-content: flex-end; /* Conteúdo na parte inferior da tela */
             position: relative;
             min-height: 100vh;
+            /* Transição suave para a mudança de imagem de fundo */
+            transition: background-image 0.5s ease-in-out; 
         }
         .content-overlay {
             background-color: rgba(0, 0, 0, 0.6); /* Fundo semi-transparente para o texto */
@@ -132,7 +134,7 @@
                         
                         <!-- Endereço e Cidade (Dados 2 e 3 - Vermelho) -->
                         <p class="font-bold text-red-400" id="display-location">
-                            Av. General Mello, 85, Jd. Califórnia, Cuiabá - MT
+                            Av. General Mello, 85, Jd. Califórnia, Cuiabá/MT
                         </p>
                     </div>
                 </div>
@@ -152,10 +154,12 @@
     <script>
         // Variáveis globais para armazenar a seleção do formato e URLs das imagens
         let selectedFormat = null;
-        // ATENÇÃO: SUBSTITUA ESTES PLACEHOLDERS PELAS SUAS IMAGENS REAIS
+        
+        // --- CAMINHOS RELATIVOS DAS IMAGENS NO REPOSITÓRIO GITHUB ---
+        // AJUSTADO: As imagens estão no mesmo nível do index.html (não há pasta 'assets').
         const imageUrls = {
-            '16:9': 'Convite 16-9.jpg?text=FUNDO+16:9+AQUI', // URL da sua imagem 16:9
-            '9:16': 'Convite 9-16.jpg?text=FUNDO+9:16+AQUI'  // URL da sua imagem 9:16
+            '16:9': './Convite 16-9.jpg', // Caminho atualizado para o mesmo diretório
+            '9:16': './Convite 9-16.jpg'  // Caminho atualizado para o mesmo diretório
         };
         
         // Elementos do DOM
@@ -241,7 +245,7 @@
             const city = churchCityInput.value.trim() || "";
             displayLocation.textContent = `${address}${city ? ', ' + city : ''}`;
 
-            // Dado 4: Horário Local (Opcional - Vermelho se for diferente de 17h BRT)
+            // Dado 4: Horário Local (Opcional - Vermelho se for diferente do padrão)
             const localTime = localTimeInput.value.trim();
             const defaultTimeText = '17h (Horário de Brasília)';
             let timeText;
