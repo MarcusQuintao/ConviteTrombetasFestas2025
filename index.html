@@ -99,7 +99,7 @@
 
         <!-- TELA 1: Formulário de Entrada e Seleção de Formato -->
         <div id="form-screen" class="space-y-6">
-            <h1 class="text-3xl font-bold text-center mb-6">Crie seu Convite Personalizado</h1>
+            <h1 class="text-3xl font-bold text-center mb-6">Crie seu Convite Personalizado - TROMBETAS & FESTAS 2025</h1>
             <p class="text-center text-gray-400">Preencha os dados e escolha o formato da imagem de fundo para gerar seu convite.</p>
 
             <!-- CAMPOS DE ENTRADA -->
@@ -107,19 +107,19 @@
                 <div>
                     <!-- CAMPO 1: Nome do Convidado -->
                     <label for="guest-name" class="block text-sm font-medium text-gray-300">1. Nome do Convidado</label>
-                    <input type="text" id="guest-name" placeholder="Ex: João da Silva"
+                    <input type="text" id="guest-name" placeholder="Ex: João Paulo"
                            class="mt-1 block w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:ring-amber-500 focus:border-amber-500 transition duration-150">
                 </div>
                 <div>
                     <!-- CAMPO 2: Endereço da Igreja -->
                     <label for="church-address" class="block text-sm font-medium text-gray-300">2. Endereço da Igreja</label>
-                    <input type="text" id="church-address" placeholder="Ex: Av. General Mello, 85, Jd. Califórnia"
+                    <input type="text" id="church-address" placeholder="Ex: Av. General Mello, 85, Bairro Jd. Califórnia"
                            class="mt-1 block w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:ring-amber-500 focus:border-amber-500 transition duration-150">
                 </div>
                 <div>
                     <!-- CAMPO 3: Cidade da Igreja -->
                     <label for="church-city" class="block text-sm font-medium text-gray-300">3. Cidade da Igreja</label>
-                    <input type="text" id="church-city" placeholder="Ex: Cuiabá - MT"
+                    <input type="text" id="church-city" placeholder="Ex: Cuiabá/MT"
                            class="mt-1 block w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:ring-amber-500 focus:border-amber-500 transition duration-150">
                 </div>
                 <div>
@@ -151,7 +151,7 @@
 
             <button id="generate-invite"
                     class="w-full py-3 bg-amber-600 hover:bg-amber-700 rounded-lg font-bold text-white shadow-xl transition duration-300 disabled:opacity-50 mt-6">
-                Personalizar Convite
+                Gerar Convite
             </button>
         </div>
 
@@ -163,7 +163,7 @@
                 
                 <!-- Overlay de Conteúdo Personalizado -->
                 <div class="content-overlay">
-                    <p class="text-xs font-semibold uppercase text-amber-400 mb-2">Convite Especial</p>
+                    <p class="text-xs font-semibold uppercase text-amber-400 mb-2">CONVITE ESPECIAL</p>
 
                     <!-- DADOS PERSONALIZADOS -->
                     <!-- Nome do Convidado (Dado 1 - Vermelho) -->
@@ -191,7 +191,7 @@
                         </div>
 
                         <!-- Linha fixa: "Convidamos vocês para assistirem ao evento conosco na:" -->
-                        <p class="mt-2 text-gray-400">Convidamos vocês para assistirem ao evento conosco na:</p>
+                        <p class="mt-2 text-gray-400">Convidamos vocês para assistirem ao evento conosco no endereço:</p>
                         
                         <!-- Endereço e Cidade (Dados 2 e 3 - Vermelho) -->
                         <p class="font-bold text-red-400" id="display-location">
@@ -215,7 +215,7 @@
                     class="w-full max-w-sm py-3 bg-green-600 hover:bg-green-700 rounded-lg font-bold text-white shadow-xl transition duration-300 flex items-center justify-center space-x-2">
                 <!-- Ícone de Download -->
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
-                <span>Baixar Convite (PNG)</span>
+                <span>Baixar Convite</span>
             </button>
             
             <div id="loading-message" class="text-sm text-gray-400 hidden">
@@ -412,7 +412,7 @@
                 console.error("Erro ao gerar imagem:", error);
                 
                 const message = document.createElement('p');
-                message.textContent = "Ocorreu um erro ao tentar gerar o download da imagem. Verifique se as imagens do GitHub estão acessíveis.";
+                message.textContent = "Ocorreu um erro ao tentar gerar o download da imagem. Tente novamente mais tarde. Obrigado!";
                 message.className = "text-red-400 mt-2";
                 previewScreen.appendChild(message);
                 
