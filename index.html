@@ -10,7 +10,7 @@
     <!-- Inclui a biblioteca html2canvas para permitir a geração da imagem (download) -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 
-    <!-- Configuração personalizada do Tailwind para usar a fonte Inter e cores -->
+    <!-- Configuração personalizada do Tailwind e CSS de controle de layout -->
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap');
         body {
@@ -27,11 +27,10 @@
             flex-direction: column;
             justify-content: flex-end; /* Conteúdo na parte inferior da tela */
             position: relative;
-            /* Garante que o contêiner nunca fique muito pequeno, mas se ajusta ao pai */
             width: 100%; 
             min-height: 400px;
             transition: background-image 0.5s ease-in-out; 
-            overflow: hidden; /* Importante para garantir que o html2canvas capture apenas o limite */
+            overflow: hidden; 
         }
 
         /* Classe para forçar a proporção 16:9 */
@@ -41,70 +40,28 @@
 
         /* Classe para forçar a proporção 9:16 (retrato) */
         .aspect-9-16 {
-            /* Mantém a proporção 9:16 */
             aspect-ratio: 9 / 16;
-            /* Limita a altura para caber na tela, mantendo a proporção. */
-            max-height: 80vh; /* Ajuste mais fino para caber no PC */
-            /* Limita a largura para simular um celular no desktop */
+            max-height: 80vh; /* Ajuste para caber na tela do PC */
             max-width: 400px; 
         }
 
         .content-overlay {
             background-color: rgba(0, 0, 0, 0.6); /* Fundo semi-transparente para o texto */
-            padding: 2vw 1.5vw; /* AJUSTADO: Usa VW para responsividade uniforme */
+            /* Padding base em REM, será escalonado pelo JS */
+            padding: 0.75rem 1rem; 
             width: 100%;
             text-align: center;
             border-top-left-radius: 0.5rem;
             border-top-right-radius: 0.5rem;
-            /* Garante que o texto fique por cima da imagem de fundo */
             z-index: 10;
         }
         
-        /* O overlay principal deve ficar por baixo dos botões de voltar/download */
         #preview-container {
              position: relative;
         }
-
-        /* Tamanhos de Fonte com VW para consistência em todos os dispositivos */
-        .content-overlay .text-2xl { /* Nome do Convidado */
-            font-size: 4.5vw; 
-        }
-        .content-overlay .text-lg { /* Título do Culto */
-            font-size: 3.5vw; 
-            line-height: 1.2;
-        }
-        .content-overlay .text-sm { /* Textos menores */
-            font-size: 2.5vw; 
-        }
-        .content-overlay .text-xs { /* Textos ainda menores */
-            font-size: 2vw; 
-        }
-
-        /* Ajustes específicos para garantir o espaçamento correto no convite */
-        .content-overlay h2 {
-            margin-bottom: 0.5vw !important;
-        }
-        .content-overlay p {
-            margin-bottom: 0.5vw;
-        }
-
-        /* AJUSTE PARA O FORMATO 9:16 (MOBILE) */
-        /* Força o tamanho da fonte a ser ainda menor para que caiba no viewport estreito */
-        @media (max-width: 640px) {
-            .aspect-9-16 .content-overlay .text-2xl {
-                font-size: 6vw; 
-            }
-            .aspect-9-16 .content-overlay .text-lg {
-                font-size: 4vw; 
-            }
-            .aspect-9-16 .content-overlay .text-sm {
-                font-size: 3vw; 
-            }
-            .aspect-9-16 .content-overlay .text-xs {
-                font-size: 2.5vw; 
-            }
-        }
-
+        
+        /* Classes Tailwind padrão (text-2xl, etc.) em REM, mas a raiz (html font-size) será ajustada via JS */
+        
     </style>
 </head>
 <body class="min-h-screen flex items-center justify-center">
@@ -122,7 +79,7 @@
                 <div>
                     <!-- CAMPO 1: Nome do Convidado -->
                     <label for="guest-name" class="block text-sm font-medium text-gray-300">1. Nome do Convidado</label>
-                    <input type="text" id="guest-name" placeholder="Ex: João da Silva"
+                    <input type="text" id="guest-name" placeholder="Ex: João Paulo"
                            class="mt-1 block w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:ring-amber-500 focus:border-amber-500 transition duration-150">
                 </div>
                 <div>
@@ -244,7 +201,6 @@
         let selectedFormat = null;
         
         // --- CAMINHOS RELATIVOS DAS IMAGENS NO REPOSITÓRIO GITHUB ---
-        // As imagens estão no mesmo nível do index.html.
         const imageUrls = {
             '16:9': './Convite 16-9.jpg', 
             '9:16': './Convite 9-16.jpg'  
@@ -274,6 +230,27 @@
         const dateTimeContainer = document.getElementById('date-time-container');
         
         // --- FUNÇÕES DE LÓGICA ---
+        
+        /**
+         * FUNÇÃO CRÍTICA: Escala o tamanho da fonte (e, por consequência, o layout) 
+         * para que o convite seja consistente em qualquer dispositivo.
+         */
+        function scaleText() {
+            // Referência de largura: A largura do contêiner de preview.
+            const containerWidth = previewContainer.offsetWidth;
+            const htmlElement = document.documentElement;
+
+            // Fator de escala: Define a fonte base do HTML. 
+            // 16px é o padrão de muitos navegadores.
+            // Aqui, usamos o containerWidth para definir o 'rem' de forma proporcional.
+            // Testes indicaram que containerWidth / 30 é um bom fator para manter o layout.
+            const scaleFactor = containerWidth / 30; 
+            
+            // Define o font-size do elemento raiz (HTML) para forçar o escalonamento de todos os 'rem'
+            // O valor mínimo de 12px garante que não fique ilegível em telas minúsculas.
+            htmlElement.style.fontSize = `${Math.max(12, scaleFactor)}px`;
+        }
+
 
         /**
          * Alterna a visibilidade para a tela de formulário.
@@ -281,6 +258,8 @@
         function showFormScreen() {
             previewScreen.classList.add('hidden');
             formScreen.classList.remove('hidden');
+            // Remove o escalonamento de fonte ao voltar para a tela do formulário
+            document.documentElement.style.fontSize = '16px'; 
         }
 
         /**
@@ -291,12 +270,10 @@
             previewContainer.classList.remove('aspect-16-9', 'aspect-9-16');
             if (format === '16:9') {
                 previewContainer.classList.add('aspect-16-9');
-                // Garante que o 16:9 ocupe a largura máxima e ajuste a altura
                 previewContainer.classList.remove('max-w-md'); 
                 previewContainer.classList.add('max-w-4xl'); 
             } else if (format === '9:16') {
                 previewContainer.classList.add('aspect-9-16');
-                // Aplica as classes de celular (largura estreita)
                 previewContainer.classList.add('max-w-md'); 
                 previewContainer.classList.remove('max-w-4xl');
             }
@@ -310,8 +287,13 @@
             previewScreen.classList.remove('flex');
             previewScreen.classList.add('flex');
             
-            // Aplica as classes de proporção antes de mostrar
+            // 1. Aplica as classes de proporção antes de mostrar
             applyAspectRatioClasses(selectedFormat);
+            
+            // 2. FORÇA O ESCALONAMENTO DE TEXTO BASEADO NO TAMANHO ATUAL DO CONVITE
+            // Isso corrige o bug do texto gigante no celular
+            scaleText(); 
+            
             previewScreen.classList.remove('hidden');
         }
 
@@ -435,6 +417,11 @@
                 previewContainer.classList.add('shadow-2xl', 'rounded-xl'); // Restaura as classes visuais
                 loadingMessage.classList.add('hidden');
                 downloadButton.disabled = false;
+                
+                // RESTAURA O TAMANHO BASE DA FONTE APÓS O DOWNLOAD
+                document.documentElement.style.fontSize = '16px';
+                // E reaplica o escalonamento para a visualização na tela
+                scaleText(); 
             }
         }
 
@@ -450,6 +437,15 @@
         formatButtons.forEach(button => {
             button.addEventListener('click', handleFormatSelection);
         });
+
+        // Event listener para redimensionar a fonte se a tela mudar de tamanho
+        window.addEventListener('resize', () => {
+             // Só aplica o escalonamento se estiver na tela de preview
+             if (!formScreen.classList.contains('hidden')) {
+                 scaleText();
+             }
+        });
+
 
         // Chamada inicial para garantir a tela de formulário no carregamento
         showFormScreen(); 
