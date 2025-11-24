@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Convite Personalizado - TROMBETAS & FESTAS 2025</title>
+    <!-- Carrega o Tailwind CSS para o estilo -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Configuração personalizada do Tailwind para usar a fonte Inter e cores -->
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap');
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #0d1117; /* Fundo escuro */
+            color: white;
+        }
+        /* Estilo para a tela de visualização */
+        .preview-screen {
+            background-size: cover;
+            background-position: center;
+            display: flex;
+            flex-direction: column;
+            justify-content: flex-end; /* Conteúdo na parte inferior da tela */
+            position: relative;
+            min-height: 100vh;
+        }
+        .content-overlay {
+            background-color: rgba(0, 0, 0, 0.6); /* Fundo semi-transparente para o texto */
+            padding: 1.5rem;
+            width: 100%;
+            text-align: center;
+            border-top-left-radius: 0.5rem;
+            border-top-right-radius: 0.5rem;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex items-center justify-center">
+
+    <!-- Container Principal do Aplicativo -->
+    <div id="app-container" class="w-full max-w-4xl p-4 md:p-8">
+
+        <!-- TELA 1: Formulário de Entrada e Seleção de Formato -->
+        <div id="form-screen" class="space-y-6">
+            <h1 class="text-3xl font-bold text-center mb-6">Crie seu Convite Personalizado</h1>
+            <p class="text-center text-gray-400">Preencha os dados e escolha o formato da imagem de fundo para gerar seu convite.</p>
+
+            <!-- CAMPOS DE ENTRADA -->
+            <div class="space-y-4">
+                <div>
+                    <!-- CAMPO 1: Nome do Convidado -->
+                    <label for="guest-name" class="block text-sm font-medium text-gray-300">1. Nome do Convidado</label>
+                    <input type="text" id="guest-name" placeholder="Ex: João Paulo"
+                           class="mt-1 block w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:ring-amber-500 focus:border-amber-500 transition duration-150">
+                </div>
+                <div>
+                    <!-- CAMPO 2: Endereço da Igreja -->
+                    <label for="church-address" class="block text-sm font-medium text-gray-300">2. Endereço da Igreja</label>
+                    <input type="text" id="church-address" placeholder="Ex: Av. General Mello, 85, Bairro Jd. Califórnia"
+                           class="mt-1 block w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:ring-amber-500 focus:border-amber-500 transition duration-150">
+                </div>
+                <div>
+                    <!-- CAMPO 3: Cidade da Igreja -->
+                    <label for="church-city" class="block text-sm font-medium text-gray-300">3. Cidade da Igreja</label>
+                    <input type="text" id="church-city" placeholder="Ex: Cuiabá/MT"
+                           class="mt-1 block w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:ring-amber-500 focus:border-amber-500 transition duration-150">
+                </div>
+                <div>
+                    <!-- CAMPO 4: Horário Local (Opcional - Usado se diferente de 17h BRT) -->
+                    <label for="local-time" class="block text-sm font-medium text-gray-300">4. Horário Local (Opcional)</label>
+                    <input type="text" id="local-time" placeholder="Ex: 18h (se diferente de 17h BRT)"
+                           class="mt-1 block w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:ring-amber-500 focus:border-amber-500 transition duration-150">
+                    <p class="text-xs text-gray-500 mt-1">Deixe em branco para usar o horário padrão: 17h (Horário de Brasília).</p>
+                </div>
+            </div>
+
+            <!-- SELETOR DE FORMATO (CAMPO 5) -->
+            <div class="space-y-3">
+                <p class="text-lg font-semibold text-gray-200">5. Escolha o Formato da Imagem de Fundo:</p>
+                <div class="flex flex-col sm:flex-row gap-4">
+                    <button id="select-16-9" data-format="16:9"
+                            class="format-button flex-1 py-3 px-6 rounded-xl border-2 border-transparent hover:border-amber-500 bg-gray-800 transition duration-300 shadow-lg">
+                        <span class="font-bold">Formato 16:9</span> <span class="text-sm text-gray-400">(Desktop / Paisagem)</span>
+                    </button>
+                    <button id="select-9-16" data-format="9:16"
+                            class="format-button flex-1 py-3 px-6 rounded-xl border-2 border-transparent hover:border-amber-500 bg-gray-800 transition duration-300 shadow-lg">
+                        <span class="font-bold">Formato 9:16</span> <span class="text-sm text-gray-400">(Celular / Retrato)</span>
+                    </button>
+                </div>
+                <div id="format-error" class="text-red-400 text-sm text-center hidden">
+                    Por favor, selecione um formato antes de prosseguir.
+                </div>
+            </div>
+
+            <button id="generate-invite"
+                    class="w-full py-3 bg-amber-600 hover:bg-amber-700 rounded-lg font-bold text-white shadow-xl transition duration-300 disabled:opacity-50 mt-6">
+                Personalizar Convite
+            </button>
+        </div>
+
+        <!-- TELA 2: Visualização do Convite Personalizado -->
+        <div id="preview-screen" class="hidden">
+            <div id="preview-container" class="preview-screen rounded-xl shadow-2xl relative">
+                
+                <!-- Overlay de Conteúdo Personalizado -->
+                <div class="content-overlay">
+                    <p class="text-xs font-semibold uppercase text-amber-400 mb-2">Convite Especial</p>
+
+                    <!-- DADOS PERSONALIZADOS -->
+                    <!-- Nome do Convidado (Dado 1 - Vermelho) -->
+                    <h2 class="text-2xl font-extrabold mb-4 text-red-400" id="display-guest-name">Olá, Convidado!</h2>
+
+                    <!-- Texto fixo: "Você e sua família são nossos convidados de honra para o:" -->
+                    <p class="text-sm text-gray-300 mb-2">
+                        Você e sua família são nossos convidados de honra para o:
+                    </p>
+                    
+                    <!-- Nome do Culto (Fixo) -->
+                    <p class="text-lg font-bold text-amber-300 mb-6">"Culto Internacional - Trombetas e Festas 2025"</p>
+                    
+                    <!-- Texto Fixo da Informação do Evento -->
+                    <div class="text-sm text-gray-200 space-y-1">
+                        <!-- Linha fixa: "Será um evento de alerta..." -->
+                        <p class="text-gray-400">Será um evento de alerta para o mundo sobre os acontecimentos atuais que antecedem a volta de Jesus.</p>
+                        
+                        <!-- Data e Horário -->
+                        <p>Data: <span class="font-semibold">29 de Novembro de 2025</span></p>
+                        <!-- Horário (Condicional - Vermelho se for diferente do padrão) -->
+                        <p id="display-time">Horário: <span class="font-semibold">17h (Horário de Brasília)</span></p>
+                        
+                        <!-- Linha fixa: "Convidamos vocês para assistirem ao evento conosco na:" -->
+                        <p class="mt-2 text-gray-400">Convidamos vocês para assistirem ao evento conosco no endereço:</p>
+                        
+                        <!-- Endereço e Cidade (Dados 2 e 3 - Vermelho) -->
+                        <p class="font-bold text-red-400" id="display-location">
+                            Av. General Mello, 85, Jd. Califórnia, Cuiabá - MT
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Botão de Voltar -->
+                <button onclick="showFormScreen()"
+                        class="absolute top-4 left-4 p-2 bg-gray-800/70 hover:bg-gray-700 rounded-full text-white transition duration-300">
+                    <!-- Icone de Seta para Esquerda (SVG) -->
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
+                    </svg>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Variáveis globais para armazenar a seleção do formato e URLs das imagens
+        let selectedFormat = null;
+        // ATENÇÃO: SUBSTITUA ESTES PLACEHOLDERS PELAS SUAS IMAGENS REAIS
+        const imageUrls = {
+            '16:9': 'https://placehold.co/1280x720/0f172a/ffffff?text=FUNDO+16:9+AQUI', // URL da sua imagem 16:9
+            '9:16': 'https://placehold.co/720x1280/0f172a/ffffff?text=FUNDO+9:16+AQUI'  // URL da sua imagem 9:16
+        };
+        
+        // Elementos do DOM
+        const formScreen = document.getElementById('form-screen');
+        const previewScreen = document.getElementById('preview-screen');
+        const previewContainer = document.getElementById('preview-container');
+        const generateButton = document.getElementById('generate-invite');
+        const formatButtons = document.querySelectorAll('.format-button');
+        const formatError = document.getElementById('format-error');
+
+        // Campos de entrada
+        const guestNameInput = document.getElementById('guest-name');
+        const churchAddressInput = document.getElementById('church-address');
+        const churchCityInput = document.getElementById('church-city');
+        const localTimeInput = document.getElementById('local-time');
+
+        // Campos de exibição
+        const displayGuestName = document.getElementById('display-guest-name');
+        const displayLocation = document.getElementById('display-location');
+        const displayTime = document.getElementById('display-time');
+        
+        // --- FUNÇÕES DE LÓGICA ---
+
+        /**
+         * Alterna a visibilidade para a tela de formulário.
+         */
+        function showFormScreen() {
+            previewScreen.classList.add('hidden');
+            formScreen.classList.remove('hidden');
+        }
+
+        /**
+         * Alterna a visibilidade para a tela de visualização do convite.
+         */
+        function showPreviewScreen() {
+            formScreen.classList.add('hidden');
+            previewScreen.classList.remove('hidden');
+            // Garante que a tela de preview use toda a altura da viewport no celular (formato 9:16)
+            if (selectedFormat === '9:16') {
+                previewContainer.classList.add('min-h-screen', 'w-full', 'max-w-md', 'mx-auto');
+                previewContainer.classList.remove('max-w-4xl');
+            } else {
+                previewContainer.classList.remove('min-h-screen', 'w-full', 'max-w-md', 'mx-auto');
+                previewContainer.classList.add('max-w-4xl');
+            }
+        }
+
+        /**
+         * Trata a seleção do formato (16:9 ou 9:16).
+         * @param {Event} event - O evento de clique.
+         */
+        function handleFormatSelection(event) {
+            // Remove a seleção de todos os botões
+            formatButtons.forEach(btn => btn.classList.remove('bg-amber-600', 'border-amber-500'));
+            
+            // Adiciona a seleção ao botão clicado
+            const clickedButton = event.currentTarget;
+            selectedFormat = clickedButton.dataset.format;
+            clickedButton.classList.add('bg-amber-600', 'border-amber-500');
+            
+            // Oculta a mensagem de erro
+            formatError.classList.add('hidden');
+        }
+
+        /**
+         * Gera o convite, aplicando os dados e o fundo e alternando a tela.
+         */
+        function generateInvite() {
+            // 1. Validação do Formato
+            if (!selectedFormat) {
+                formatError.classList.remove('hidden');
+                return;
+            }
+
+            // 2. Coleta dos Dados (com valores padrão e formatação)
+            
+            // Dado 1: Nome do Convidado (Vermelho)
+            const guestName = guestNameInput.value.trim() || "Olá, Convidado!";
+            displayGuestName.textContent = guestName;
+
+            // Dados 2 e 3: Localização (Vermelho)
+            const address = churchAddressInput.value.trim() || "Endereço da Igreja (Não Informado)";
+            const city = churchCityInput.value.trim() || "";
+            displayLocation.textContent = `${address}${city ? ', ' + city : ''}`;
+
+            // Dado 4: Horário Local (Opcional - Vermelho se for diferente de 17h BRT)
+            const localTime = localTimeInput.value.trim();
+            const defaultTimeText = '17h (Horário de Brasília)';
+            let timeText;
+            let isCustomTime = false;
+
+            if (localTime && localTime.toLowerCase() !== '17h') {
+                timeText = `${localTime}`;
+                isCustomTime = true;
+            } else {
+                timeText = defaultTimeText;
+            }
+
+            // Aplica o texto e a cor condicionalmente
+            displayTime.innerHTML = `Horário: <span class="font-semibold">${timeText}</span>`;
+            if (isCustomTime) {
+                // Se for um horário personalizado, aplicamos a cor Vermelha
+                displayTime.classList.add('text-red-400');
+            } else {
+                // Caso contrário, usamos a cor padrão (cinza/branco)
+                displayTime.classList.remove('text-red-400');
+            }
+            
+            // 3. Aplica a Imagem de Fundo
+            const imageUrl = imageUrls[selectedFormat];
+            previewContainer.style.backgroundImage = `url('${imageUrl}')`;
+
+            // 4. Troca de Tela
+            showPreviewScreen();
+        }
+
+        // --- LISTENERS DE EVENTOS ---
+
+        // Listener para o botão de geração
+        generateButton.addEventListener('click', generateInvite);
+
+        // Listeners para os botões de seleção de formato
+        formatButtons.forEach(button => {
+            button.addEventListener('click', handleFormatSelection);
+        });
+
+        // Chamada inicial para garantir a tela de formulário no carregamento
+        showFormScreen(); 
+        
+    </script>
+</body>
+</html>
