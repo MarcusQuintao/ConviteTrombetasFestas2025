@@ -389,6 +389,7 @@
                 // Usa html2canvas para capturar o conteúdo do div
                 const canvas = await html2canvas(previewContainer, {
                     // Tenta forçar o uso da imagem de fundo (CORS é um desafio)
+                    backgroundColor: null,
                     useCORS: true, 
                     allowTaint: true,
                     // Garante que a resolução seja alta para o download
