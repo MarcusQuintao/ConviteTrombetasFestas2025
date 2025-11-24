@@ -44,14 +44,14 @@
             /* Mantém a proporção 9:16 */
             aspect-ratio: 9 / 16;
             /* Limita a altura para caber na tela, mantendo a proporção. */
-            max-height: 80vh; /* AJUSTE MAIS FINO: Reduzido para 80vh */
+            max-height: 80vh; /* Ajuste mais fino para caber no PC */
             /* Limita a largura para simular um celular no desktop */
             max-width: 400px; 
         }
 
         .content-overlay {
             background-color: rgba(0, 0, 0, 0.6); /* Fundo semi-transparente para o texto */
-            padding: 0.75rem 1rem; /* AJUSTE AQUI: Reduzido ainda mais o padding */
+            padding: 0.75rem 1rem; /* Padding reduzido para compactar o texto */
             width: 100%;
             text-align: center;
             border-top-left-radius: 0.5rem;
@@ -65,12 +65,11 @@
              position: relative;
         }
 
-        /* AJUSTE MAIS AGRESSIVO: Tamanhos de fonte menores para o overlay no formato 16:9 */
-        /* Isso afetará o texto dentro do overlay quando a tela for maior */
-        @media (min-width: 768px) { /* Para telas médias e maiores */
+        /* AJUSTES FINAIS PARA COMPACTAÇÃO NO FORMATO 16:9 (Desktop) */
+        @media (min-width: 768px) { 
             .aspect-16-9 .content-overlay .text-2xl { /* Nome do Convidado */
                 font-size: 1.5rem; /* 24px */
-                margin-bottom: 0.5rem; /* Reduz margem */
+                margin-bottom: 0.5rem; 
             }
             .aspect-16-9 .content-overlay .text-sm { /* Textos menores */
                 font-size: 0.75rem; /* 12px */
@@ -80,10 +79,15 @@
             }
             .aspect-16-9 .content-overlay .text-lg { /* Título do Culto */
                 font-size: 1.125rem; /* 18px */
-                margin-bottom: 0.75rem; /* Reduz margem */
+                margin-bottom: 0.75rem; 
             }
             .aspect-16-9 .content-overlay p {
                 margin-bottom: 0.2rem; /* Espaçamento interno menor para parágrafos */
+            }
+            /* Garantir que data e hora fiquem na mesma linha no 16:9 */
+            .aspect-16-9 #date-time-container {
+                flex-direction: row; /* Força linha */
+                justify-content: center;
             }
         }
     </style>
@@ -103,19 +107,19 @@
                 <div>
                     <!-- CAMPO 1: Nome do Convidado -->
                     <label for="guest-name" class="block text-sm font-medium text-gray-300">1. Nome do Convidado</label>
-                    <input type="text" id="guest-name" placeholder="Ex: João Paulo!"
+                    <input type="text" id="guest-name" placeholder="Ex: João da Silva"
                            class="mt-1 block w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:ring-amber-500 focus:border-amber-500 transition duration-150">
                 </div>
                 <div>
                     <!-- CAMPO 2: Endereço da Igreja -->
                     <label for="church-address" class="block text-sm font-medium text-gray-300">2. Endereço da Igreja</label>
-                    <input type="text" id="church-address" placeholder="Ex: Av. General Mello, 85, Bairro Jd. Califórnia"
+                    <input type="text" id="church-address" placeholder="Ex: Av. General Mello, 85, Jd. Califórnia"
                            class="mt-1 block w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:ring-amber-500 focus:border-amber-500 transition duration-150">
                 </div>
                 <div>
                     <!-- CAMPO 3: Cidade da Igreja -->
                     <label for="church-city" class="block text-sm font-medium text-gray-300">3. Cidade da Igreja</label>
-                    <input type="text" id="church-city" placeholder="Ex: Cuiabá/MT"
+                    <input type="text" id="church-city" placeholder="Ex: Cuiabá - MT"
                            class="mt-1 block w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:ring-amber-500 focus:border-amber-500 transition duration-150">
                 </div>
                 <div>
@@ -171,21 +175,23 @@
                     </p>
                     
                     <!-- Nome do Culto (Fixo) -->
-                    <p class="text-lg font-bold text-amber-300 mb-4">Culto Internacional</p>
-                    <p class="text-lg font-bold text-amber-300 mb-4">Trombetas e Festas 2025</p>
+                    <p class="text-lg font-bold text-amber-300 mb-4">
+                        "Culto Internacional<br class="md:hidden">Trombetas e Festas 2025"
+                    </p>
                     
                     <!-- Texto Fixo da Informação do Evento -->
                     <div class="text-sm text-gray-200 space-y-1">
                         <!-- Linha fixa: "Será um evento de alerta..." -->
                         <p class="text-gray-400">Será um evento de alerta para o mundo sobre os acontecimentos atuais que antecedem a volta de Jesus.</p>
                         
-                        <!-- Data e Horário -->
-                        <p>Data: <span class="font-semibold">29 de Novembro de 2025</span></p>
-                        <!-- Horário (Condicional - Vermelho se for diferente do padrão) -->
-                        <p id="display-time">Horário: <span class="font-semibold">17h (Horário de Brasília)</span></p>
-                        
+                        <!-- Data e Horário (Juntos para o 16:9, Separados para o 9:16) -->
+                        <div id="date-time-container" class="flex justify-center flex-col sm:flex-row sm:space-x-2">
+                            <p id="display-date">Data: <span class="font-semibold">29 de Novembro de 2025</span></p>
+                            <p id="display-time">Horário: <span class="font-semibold">17h (Horário de Brasília)</span></p>
+                        </div>
+
                         <!-- Linha fixa: "Convidamos vocês para assistirem ao evento conosco na:" -->
-                        <p class="mt-2 text-gray-400">Convidamos vocês para assistirem ao evento conosco no endereço:</p>
+                        <p class="mt-2 text-gray-400">Convidamos vocês para assistirem ao evento conosco na:</p>
                         
                         <!-- Endereço e Cidade (Dados 2 e 3 - Vermelho) -->
                         <p class="font-bold text-red-400" id="display-location">
@@ -204,7 +210,7 @@
                 </button>
             </div>
             
-            <!-- BOTÃO DE DOWNLOAD (Fica FORA do preview-container para não aparecer na imagem final) -->
+            <!-- BOTÃO DE DOWNLOAD -->
             <button id="download-invite"
                     class="w-full max-w-sm py-3 bg-green-600 hover:bg-green-700 rounded-lg font-bold text-white shadow-xl transition duration-300 flex items-center justify-center space-x-2">
                 <!-- Ícone de Download -->
@@ -250,6 +256,7 @@
         const displayGuestName = document.getElementById('display-guest-name');
         const displayLocation = document.getElementById('display-location');
         const displayTime = document.getElementById('display-time');
+        const dateTimeContainer = document.getElementById('date-time-container');
         
         // --- FUNÇÕES DE LÓGICA ---
 
@@ -286,8 +293,7 @@
         function showPreviewScreen() {
             formScreen.classList.add('hidden');
             previewScreen.classList.remove('flex');
-            previewScreen.classList.add('flex'); // Re-aplica flex para o pai do preview-container
-            // A classe 'flex-col items-center' já está na div preview-screen
+            previewScreen.classList.add('flex');
             
             // Aplica as classes de proporção antes de mostrar
             applyAspectRatioClasses(selectedFormat);
@@ -325,7 +331,6 @@
             
             // Dado 1: Nome do Convidado (Vermelho)
             const rawGuestName = guestNameInput.value.trim();
-            // AJUSTE AQUI: Adiciona "Olá, " se o campo não estiver vazio, caso contrário, usa o padrão.
             const guestName = rawGuestName ? `Olá, ${rawGuestName}!` : "Olá, Convidado!"; 
             displayGuestName.textContent = guestName;
 
@@ -336,16 +341,15 @@
 
             // Dado 4: Horário Local (Opcional - Vermelho se for diferente do padrão)
             const localTime = localTimeInput.value.trim();
-            const defaultTimeText = '17h (Horário de Brasília)';
             let timeText;
             let isCustomTime = false;
 
             // Verifica se o valor é diferente de '17h' (case-insensitive) e não está vazio
             if (localTime && localTime.replace(/\s/g, '').toLowerCase() !== '17h') {
-                timeText = `${localTime}`;
+                timeText = `${localTime} (Horário Local)`;
                 isCustomTime = true;
             } else {
-                timeText = defaultTimeText;
+                timeText = '17h (Horário de Brasília)';
             }
 
             // Aplica o texto e a cor condicionalmente
@@ -357,8 +361,6 @@
             if (isCustomTime) {
                 // Se for um horário personalizado, aplicamos a cor Vermelha
                 displayTime.classList.add('text-red-400');
-            } else {
-                // Se for o horário padrão, a cor será herdada (cinza/branco)
             }
             
             // 3. Aplica a Imagem de Fundo
@@ -376,8 +378,7 @@
             loadingMessage.classList.remove('hidden');
             downloadButton.disabled = true;
 
-            // O html2canvas precisa de um momento para renderizar o DOM corretamente,
-            // especialmente depois que as URLs de fundo são alteradas.
+            // O html2canvas precisa de um momento para renderizar o DOM corretamente
             await new Promise(resolve => setTimeout(resolve, 100));
 
             // Remove temporariamente o botão de voltar para não aparecer na imagem
@@ -387,7 +388,7 @@
             try {
                 // Usa html2canvas para capturar o conteúdo do div
                 const canvas = await html2canvas(previewContainer, {
-                    // Tenta forçar o uso da imagem de fundo
+                    // Tenta forçar o uso da imagem de fundo (CORS é um desafio)
                     useCORS: true, 
                     allowTaint: true,
                     // Garante que a resolução seja alta para o download
@@ -409,17 +410,16 @@
                 
             } catch (error) {
                 console.error("Erro ao gerar imagem:", error);
-                // Exibe uma mensagem de erro simples
-                // Usando DOM manipulation ao invés de alert()
+                
                 const message = document.createElement('p');
-                message.textContent = "Ocorreu um erro ao tentar gerar o download da imagem. Tente novamente.";
+                message.textContent = "Ocorreu um erro ao tentar gerar o download da imagem. Verifique se as imagens do GitHub estão acessíveis.";
                 message.className = "text-red-400 mt-2";
                 previewScreen.appendChild(message);
                 
-                setTimeout(() => message.remove(), 5000); // Remove a mensagem após 5 segundos
+                setTimeout(() => message.remove(), 5000); 
             } finally {
                 // Restaura o botão de voltar e oculta a mensagem de carregamento
-                backButton.style.display = 'flex'; // ou 'block' se o display original fosse 'block'
+                backButton.style.display = 'flex'; 
                 loadingMessage.classList.add('hidden');
                 downloadButton.disabled = false;
             }
