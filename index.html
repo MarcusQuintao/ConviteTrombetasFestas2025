@@ -51,7 +51,7 @@
 
         .content-overlay {
             background-color: rgba(0, 0, 0, 0.6); /* Fundo semi-transparente para o texto */
-            padding: 0.75rem 1rem; /* Padding reduzido para compactar o texto */
+            padding: 2vw 1.5vw; /* AJUSTADO: Usa VW para responsividade uniforme */
             width: 100%;
             text-align: center;
             border-top-left-radius: 0.5rem;
@@ -65,31 +65,46 @@
              position: relative;
         }
 
-        /* AJUSTES FINAIS PARA COMPACTAÇÃO NO FORMATO 16:9 (Desktop) */
-        @media (min-width: 768px) { 
-            .aspect-16-9 .content-overlay .text-2xl { /* Nome do Convidado */
-                font-size: 1.5rem; /* 24px */
-                margin-bottom: 0.5rem; 
+        /* Tamanhos de Fonte com VW para consistência em todos os dispositivos */
+        .content-overlay .text-2xl { /* Nome do Convidado */
+            font-size: 4.5vw; 
+        }
+        .content-overlay .text-lg { /* Título do Culto */
+            font-size: 3.5vw; 
+            line-height: 1.2;
+        }
+        .content-overlay .text-sm { /* Textos menores */
+            font-size: 2.5vw; 
+        }
+        .content-overlay .text-xs { /* Textos ainda menores */
+            font-size: 2vw; 
+        }
+
+        /* Ajustes específicos para garantir o espaçamento correto no convite */
+        .content-overlay h2 {
+            margin-bottom: 0.5vw !important;
+        }
+        .content-overlay p {
+            margin-bottom: 0.5vw;
+        }
+
+        /* AJUSTE PARA O FORMATO 9:16 (MOBILE) */
+        /* Força o tamanho da fonte a ser ainda menor para que caiba no viewport estreito */
+        @media (max-width: 640px) {
+            .aspect-9-16 .content-overlay .text-2xl {
+                font-size: 6vw; 
             }
-            .aspect-16-9 .content-overlay .text-sm { /* Textos menores */
-                font-size: 0.75rem; /* 12px */
+            .aspect-9-16 .content-overlay .text-lg {
+                font-size: 4vw; 
             }
-            .aspect-16-9 .content-overlay .text-xs { /* Textos ainda menores */
-                font-size: 0.65rem; /* ~10px */
+            .aspect-9-16 .content-overlay .text-sm {
+                font-size: 3vw; 
             }
-            .aspect-16-9 .content-overlay .text-lg { /* Título do Culto */
-                font-size: 1.125rem; /* 18px */
-                margin-bottom: 0.75rem; 
-            }
-            .aspect-16-9 .content-overlay p {
-                margin-bottom: 0.2rem; /* Espaçamento interno menor para parágrafos */
-            }
-            /* Garantir que data e hora fiquem na mesma linha no 16:9 */
-            .aspect-16-9 #date-time-container {
-                flex-direction: row; /* Força linha */
-                justify-content: center;
+            .aspect-9-16 .content-overlay .text-xs {
+                font-size: 2.5vw; 
             }
         }
+
     </style>
 </head>
 <body class="min-h-screen flex items-center justify-center">
@@ -107,7 +122,7 @@
                 <div>
                     <!-- CAMPO 1: Nome do Convidado -->
                     <label for="guest-name" class="block text-sm font-medium text-gray-300">1. Nome do Convidado</label>
-                    <input type="text" id="guest-name" placeholder="Ex: João Paulo"
+                    <input type="text" id="guest-name" placeholder="Ex: João da Silva"
                            class="mt-1 block w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:ring-amber-500 focus:border-amber-500 transition duration-150">
                 </div>
                 <div>
@@ -176,7 +191,7 @@
                     
                     <!-- Nome do Culto (Fixo) -->
                     <p class="text-lg font-bold text-amber-300 mb-4">
-                        "Culto Internacional - Trombetas e Festas 2025"
+                        "Culto Internacional<br class="sm:hidden">Trombetas e Festas 2025"
                     </p>
                     
                     <!-- Texto Fixo da Informação do Evento -->
@@ -355,14 +370,6 @@
             // Aplica o texto e a cor condicionalmente
             displayTime.innerHTML = `Horário: <span class="font-semibold">${timeText}</span>`;
             
-            // Remove classes de cor antes de aplicar
-            //displayTime.classList.remove('text-red-400', 'text-gray-200');
-
-            //if (isCustomTime) {
-                // Se for um horário personalizado, aplicamos a cor Vermelha
-                //displayTime.classList.add('text-red-400');
-            //}
-            
             // 3. Aplica a Imagem de Fundo
             const imageUrl = imageUrls[selectedFormat];
             previewContainer.style.backgroundImage = `url('${imageUrl}')`;
@@ -386,13 +393,14 @@
             backButton.style.display = 'none';
 
             try {
-                // Remove temporariamente a sombra do contêiner para melhor captura do html2canvas
-                previewContainer.classList.remove('shadow-2xl');
+                // Remove temporariamente a sombra e o arredondamento para melhor captura do html2canvas
+                // e para remover a borda branca no PNG final.
+                previewContainer.classList.remove('shadow-2xl', 'rounded-xl');
                 
                 // Usa html2canvas para capturar o conteúdo do div
                 const canvas = await html2canvas(previewContainer, {
-                    // Tenta forçar o uso da imagem de fundo (CORS é um desafio)
-                    backgroundColor: null,
+                    // Define o fundo como NULL (transparente)
+                    backgroundColor: null, 
                     useCORS: true, 
                     allowTaint: true,
                     // Garante que a resolução seja alta para o download
@@ -424,6 +432,7 @@
             } finally {
                 // Restaura o botão de voltar e oculta a mensagem de carregamento
                 backButton.style.display = 'flex'; 
+                previewContainer.classList.add('shadow-2xl', 'rounded-xl'); // Restaura as classes visuais
                 loadingMessage.classList.add('hidden');
                 downloadButton.disabled = false;
             }
