@@ -6,6 +6,10 @@
     <title>Convite Personalizado - TROMBETAS & FESTAS 2025</title>
     <!-- Carrega o Tailwind CSS para o estilo -->
     <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Inclui a biblioteca html2canvas para permitir a geração da imagem (download) -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+
     <!-- Configuração personalizada do Tailwind para usar a fonte Inter e cores -->
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap');
@@ -18,7 +22,7 @@
         /* Estilo base para a tela de visualização */
         .preview-screen {
             background-size: cover;
-            background-position: center;
+            background-position: top; /* Prioriza a parte superior da imagem */
             display: flex;
             flex-direction: column;
             justify-content: flex-end; /* Conteúdo na parte inferior da tela */
@@ -27,6 +31,7 @@
             width: 100%; 
             min-height: 400px;
             transition: background-image 0.5s ease-in-out; 
+            overflow: hidden; /* Importante para garantir que o html2canvas capture apenas o limite */
         }
 
         /* Classe para forçar a proporção 16:9 */
@@ -42,7 +47,6 @@
             max-height: 90vh; 
             /* Limita a largura para simular um celular no desktop */
             max-width: 400px; 
-            /* A altura é definida implicitamente pelo aspecto e max-height */
         }
 
         .content-overlay {
@@ -52,6 +56,13 @@
             text-align: center;
             border-top-left-radius: 0.5rem;
             border-top-right-radius: 0.5rem;
+            /* Garante que o texto fique por cima da imagem de fundo */
+            z-index: 10;
+        }
+        
+        /* O overlay principal deve ficar por baixo dos botões de voltar/download */
+        #preview-container {
+             position: relative;
         }
     </style>
 </head>
@@ -70,19 +81,19 @@
                 <div>
                     <!-- CAMPO 1: Nome do Convidado -->
                     <label for="guest-name" class="block text-sm font-medium text-gray-300">1. Nome do Convidado</label>
-                    <input type="text" id="guest-name" placeholder="Ex: Olá, João Paulo!"
+                    <input type="text" id="guest-name" placeholder="Ex: João Paulo"
                            class="mt-1 block w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:ring-amber-500 focus:border-amber-500 transition duration-150">
                 </div>
                 <div>
                     <!-- CAMPO 2: Endereço da Igreja -->
                     <label for="church-address" class="block text-sm font-medium text-gray-300">2. Endereço da Igreja</label>
-                    <input type="text" id="church-address" placeholder="Ex: Av. General Mello, 85, Jd. Califórnia"
+                    <input type="text" id="church-address" placeholder="Ex: Av. General Mello, 85, Bairro Jd. Califórnia"
                            class="mt-1 block w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:ring-amber-500 focus:border-amber-500 transition duration-150">
                 </div>
                 <div>
                     <!-- CAMPO 3: Cidade da Igreja -->
                     <label for="church-city" class="block text-sm font-medium text-gray-300">3. Cidade da Igreja</label>
-                    <input type="text" id="church-city" placeholder="Ex: Cuiabá - MT"
+                    <input type="text" id="church-city" placeholder="Ex: Cuiabá/MT"
                            class="mt-1 block w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:ring-amber-500 focus:border-amber-500 transition duration-150">
                 </div>
                 <div>
@@ -119,7 +130,10 @@
         </div>
 
         <!-- TELA 2: Visualização do Convite Personalizado -->
-        <div id="preview-screen" class="hidden flex justify-center"> <!-- Adicionado 'flex justify-center' para centralizar no modo 9:16 no desktop -->
+        <!-- O preview-screen agora contém o botão de Download -->
+        <div id="preview-screen" class="hidden flex flex-col items-center space-y-4">
+            
+            <!-- Contêiner do Convite (Alvo para o html2canvas) -->
             <div id="preview-container" class="preview-screen rounded-xl shadow-2xl relative">
                 
                 <!-- Overlay de Conteúdo Personalizado -->
@@ -158,14 +172,26 @@
                     </div>
                 </div>
 
-                <!-- Botão de Voltar -->
+                <!-- Botão de Voltar (Posicionado dentro do preview-container) -->
                 <button onclick="showFormScreen()"
-                        class="absolute top-4 left-4 p-2 bg-gray-800/70 hover:bg-gray-700 rounded-full text-white transition duration-300">
+                        class="absolute top-4 left-4 p-2 bg-gray-800/70 hover:bg-gray-700 rounded-full text-white transition duration-300 z-20">
                     <!-- Icone de Seta para Esquerda (SVG) -->
                     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
                     </svg>
                 </button>
+            </div>
+            
+            <!-- BOTÃO DE DOWNLOAD (Fica FORA do preview-container para não aparecer na imagem final) -->
+            <button id="download-invite"
+                    class="w-full max-w-sm py-3 bg-green-600 hover:bg-green-700 rounded-lg font-bold text-white shadow-xl transition duration-300 flex items-center justify-center space-x-2">
+                <!-- Ícone de Download -->
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+                <span>Baixar Convite (PNG)</span>
+            </button>
+            
+            <div id="loading-message" class="text-sm text-gray-400 hidden">
+                Gerando imagem...
             </div>
         </div>
     </div>
@@ -188,6 +214,9 @@
         const generateButton = document.getElementById('generate-invite');
         const formatButtons = document.querySelectorAll('.format-button');
         const formatError = document.getElementById('format-error');
+        const downloadButton = document.getElementById('download-invite');
+        const loadingMessage = document.getElementById('loading-message');
+
 
         // Campos de entrada
         const guestNameInput = document.getElementById('guest-name');
@@ -234,9 +263,13 @@
          */
         function showPreviewScreen() {
             formScreen.classList.add('hidden');
-            previewScreen.classList.remove('hidden');
+            previewScreen.classList.remove('flex');
+            previewScreen.classList.add('flex'); // Re-aplica flex para o pai do preview-container
+            // A classe 'flex-col items-center' já está na div preview-screen
+            
             // Aplica as classes de proporção antes de mostrar
             applyAspectRatioClasses(selectedFormat);
+            previewScreen.classList.remove('hidden');
         }
 
         /**
@@ -269,7 +302,9 @@
             // 2. Coleta dos Dados (com valores padrão e formatação)
             
             // Dado 1: Nome do Convidado (Vermelho)
-            const guestName = guestNameInput.value.trim() || "Olá, Convidado!";
+            const rawGuestName = guestNameInput.value.trim();
+            // AJUSTE AQUI: Adiciona "Olá, " se o campo não estiver vazio, caso contrário, usa o padrão.
+            const guestName = rawGuestName ? `Olá, ${rawGuestName}!` : "Olá, Convidado!"; 
             displayGuestName.textContent = guestName;
 
             // Dados 2 e 3: Localização (Vermelho)
@@ -312,10 +347,69 @@
             showPreviewScreen();
         }
 
+        /**
+         * Converte o DIV do convite para uma imagem PNG e inicia o download.
+         */
+        async function downloadInvite() {
+            loadingMessage.classList.remove('hidden');
+            downloadButton.disabled = true;
+
+            // O html2canvas precisa de um momento para renderizar o DOM corretamente,
+            // especialmente depois que as URLs de fundo são alteradas.
+            await new Promise(resolve => setTimeout(resolve, 100));
+
+            // Remove temporariamente o botão de voltar para não aparecer na imagem
+            const backButton = previewContainer.querySelector('button');
+            backButton.style.display = 'none';
+
+            try {
+                // Usa html2canvas para capturar o conteúdo do div
+                const canvas = await html2canvas(previewContainer, {
+                    // Tenta forçar o uso da imagem de fundo
+                    useCORS: true, 
+                    allowTaint: true,
+                    // Garante que a resolução seja alta para o download
+                    scale: 2 
+                });
+
+                // Cria um link de download
+                const image = canvas.toDataURL("image/png");
+                const link = document.createElement('a');
+                
+                // Nome do arquivo de download
+                const filename = `Convite-${displayGuestName.textContent.replace(/Olá, |!|\s/g, '-')}-${selectedFormat}.png`;
+                
+                link.download = filename;
+                link.href = image;
+                
+                // Simula o clique para iniciar o download
+                link.click();
+                
+            } catch (error) {
+                console.error("Erro ao gerar imagem:", error);
+                // Exibe uma mensagem de erro simples
+                // Usando DOM manipulation ao invés de alert()
+                const message = document.createElement('p');
+                message.textContent = "Ocorreu um erro ao tentar gerar o download da imagem. Tente novamente.";
+                message.className = "text-red-400 mt-2";
+                previewScreen.appendChild(message);
+                
+                setTimeout(() => message.remove(), 5000); // Remove a mensagem após 5 segundos
+            } finally {
+                // Restaura o botão de voltar e oculta a mensagem de carregamento
+                backButton.style.display = 'flex'; // ou 'block' se o display original fosse 'block'
+                loadingMessage.classList.add('hidden');
+                downloadButton.disabled = false;
+            }
+        }
+
         // --- LISTENERS DE EVENTOS ---
 
         // Listener para o botão de geração
         generateButton.addEventListener('click', generateInvite);
+
+        // Listener para o novo botão de download
+        downloadButton.addEventListener('click', downloadInvite);
 
         // Listeners para os botões de seleção de formato
         formatButtons.forEach(button => {
