@@ -386,6 +386,9 @@
             backButton.style.display = 'none';
 
             try {
+                // Remove temporariamente a sombra do contêiner para melhor captura do html2canvas
+                previewContainer.classList.remove('shadow-2xl');
+                
                 // Usa html2canvas para capturar o conteúdo do div
                 const canvas = await html2canvas(previewContainer, {
                     // Tenta forçar o uso da imagem de fundo (CORS é um desafio)
