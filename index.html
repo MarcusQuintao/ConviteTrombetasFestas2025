@@ -345,7 +345,7 @@
             let isCustomTime = false;
 
             // Verifica se o valor é diferente de '17h' (case-insensitive) e não está vazio
-            if (localTime && localTime.replace(/\s/g, '').toLowerCase() !== '17h') {
+            if (localTime && localTime.replace(/\s/g, '').toLowerCase() !== '') {
                 timeText = `${localTime} (Horário Local)`;
                 isCustomTime = true;
             } else {
@@ -356,12 +356,12 @@
             displayTime.innerHTML = `Horário: <span class="font-semibold">${timeText}</span>`;
             
             // Remove classes de cor antes de aplicar
-            displayTime.classList.remove('text-red-400', 'text-gray-200');
+            //displayTime.classList.remove('text-red-400', 'text-gray-200');
 
-            if (isCustomTime) {
+            //if (isCustomTime) {
                 // Se for um horário personalizado, aplicamos a cor Vermelha
-                displayTime.classList.add('text-red-400');
-            }
+                //displayTime.classList.add('text-red-400');
+            //}
             
             // 3. Aplica a Imagem de Fundo
             const imageUrl = imageUrls[selectedFormat];
