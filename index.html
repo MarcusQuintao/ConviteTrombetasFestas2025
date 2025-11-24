@@ -10,7 +10,7 @@
     <!-- Inclui a biblioteca html2canvas para permitir a geração da imagem (download) -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 
-    <!-- Configuração personalizada do Tailwind e CSS de controle de layout -->
+    <!-- Configuração personalizada do Tailwind para usar a fonte Inter e cores -->
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@100..900&display=swap');
         body {
@@ -22,13 +22,14 @@
         /* Estilo base para a tela de visualização */
         .preview-screen {
             background-size: cover;
-            background-position: top; /* Prioriza a parte superior da imagem */
+            background-position: top center; /* Centraliza o topo */
+            background-repeat: no-repeat;
             display: flex;
             flex-direction: column;
-            justify-content: flex-end; /* Conteúdo na parte inferior da tela */
+            justify-content: flex-end; /* Alinha o conteúdo na parte inferior */
             position: relative;
             width: 100%; 
-            min-height: 400px;
+            min-height: 0; 
             transition: background-image 0.5s ease-in-out; 
             overflow: hidden; 
         }
@@ -36,188 +37,152 @@
         /* Classe para forçar a proporção 16:9 */
         .aspect-16-9 {
             aspect-ratio: 16 / 9;
+            width: 100%;
         }
 
         /* Classe para forçar a proporção 9:16 (retrato) */
         .aspect-9-16 {
             aspect-ratio: 9 / 16;
-            max-height: 80vh; /* Ajuste para caber na tela do PC */
-            max-width: 400px; 
+            max-height: 80vh; 
+            max-width: 400px;
+            width: 100%;
         }
 
         .content-overlay {
             background-color: rgba(0, 0, 0, 0.6); /* Fundo semi-transparente para o texto */
-            /* Padding base em REM, será escalonado pelo JS */
-            padding: 0.75rem 1rem; 
+            
+            /* ALTURA FIXA DE 50%: O texto tem que caber aqui dentro */
+            height: 50%;
+            
+            /* Flexbox para centralizar o conteúdo verticalmente e horizontalmente */
+            display: flex;
+            flex-direction: column;
+            justify-content: center; 
+            align-items: center;     
+            
+            /* Padding reduzido para ganhar espaço */
+            padding: 0.5rem 1rem; 
+            
             width: 100%;
             text-align: center;
             border-top-left-radius: 0.5rem;
             border-top-right-radius: 0.5rem;
             z-index: 10;
+            
+            /* Previne que o texto vaze se algo der errado */
+            overflow: hidden; 
         }
         
         #preview-container {
              position: relative;
+             box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5); 
         }
         
-        /* Classe personalizada para a cor Amarelo Exata (#FFFF00) */
-        .text-custom-yellow {
-            color: #f4f410 !important;
-        }
-        .text-custom-red {
-            /*color: #e83c3c !important;*/
-            color: #e6ab52 !important;
-        }
-        .text-custom-white {
-            color: #f0f0f0 !important;
-        }
-        /* Classes Tailwind padrão (text-2xl, etc.) em REM, mas a raiz (html font-size) será ajustada via JS */
+        /* Cores Personalizadas */
+        .text-custom-yellow { color: #f4f410 !important; }
+        .text-custom-red { color: #e6ab52 !important; }
+        .text-custom-white { color: #f0f0f0 !important; }
+
+        /* Ajustes de quebra de linha no título */
+        .aspect-9-16 #invite-title br { display: block; }
+        .aspect-16-9 #invite-title br { display: none; }
         
     </style>
 </head>
 <body class="min-h-screen flex items-center justify-center">
 
-    <!-- Container Principal do Aplicativo -->
+    <!-- Container Principal -->
     <div id="app-container" class="w-full max-w-4xl p-4 md:p-8">
 
-        <!-- TELA 1: Formulário de Entrada e Seleção de Formato -->
+        <!-- TELA 1: Formulário -->
         <div id="form-screen" class="space-y-6">
             <h1 class="text-3xl font-bold text-center mb-6">Crie seu Convite Personalizado para o</br>TROMBETAS & FESTAS 2025</h1>
             <p class="text-center text-gray-400">Preencha os dados e escolha o formato da imagem de fundo para gerar seu convite.</p>
 
-            <!-- CAMPOS DE ENTRADA -->
             <div class="space-y-4">
                 <div>
-                    <!-- CAMPO 1: Nome do Convidado -->
                     <label for="guest-name" class="block text-sm font-medium text-gray-300">1. Nome do Convidado</label>
-                    <input type="text" id="guest-name" placeholder="Ex: João Paulo"
-                           class="mt-1 block w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:ring-amber-500 focus:border-amber-500 transition duration-150">
+                    <input type="text" id="guest-name" placeholder="Ex: João Paulo" class="mt-1 block w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:ring-amber-500 focus:border-amber-500 transition duration-150">
                 </div>
                 <div>
-                    <!-- CAMPO 2: Endereço da Igreja -->
                     <label for="church-address" class="block text-sm font-medium text-gray-300">2. Endereço da Igreja</label>
-                    <input type="text" id="church-address" placeholder="Ex: Av. General Mello, 85, Bairro Jd. Califórnia"
-                           class="mt-1 block w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:ring-amber-500 focus:border-amber-500 transition duration-150">
+                    <input type="text" id="church-address" placeholder="Ex: Av. General Mello, 85, Bairro Jd. Califórnia" class="mt-1 block w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:ring-amber-500 focus:border-amber-500 transition duration-150">
                 </div>
                 <div>
-                    <!-- CAMPO 3: Cidade da Igreja -->
                     <label for="church-city" class="block text-sm font-medium text-gray-300">3. Cidade da Igreja</label>
-                    <input type="text" id="church-city" placeholder="Ex: Cuiabá/MT"
-                           class="mt-1 block w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:ring-amber-500 focus:border-amber-500 transition duration-150">
+                    <input type="text" id="church-city" placeholder="Ex: Cuiabá/MT" class="mt-1 block w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:ring-amber-500 focus:border-amber-500 transition duration-150">
                 </div>
                 <div>
-                    <!-- CAMPO 4: Horário Local (Opcional - Usado se diferente de 17h BRT) -->
                     <label for="local-time" class="block text-sm font-medium text-gray-300">4. Horário Local (Opcional)</label>
-                    <input type="text" id="local-time" placeholder="Ex: 16h (se diferente de 17h BRT)"
-                           class="mt-1 block w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:ring-amber-500 focus:border-amber-500 transition duration-150">
+                    <input type="text" id="local-time" placeholder="Ex: 16h (se diferente de 17h BRT)" class="mt-1 block w-full px-4 py-2 bg-gray-700 border border-gray-600 rounded-lg text-white placeholder-gray-400 focus:ring-amber-500 focus:border-amber-500 transition duration-150">
                     <p class="text-xs text-gray-500 mt-1">Deixe em branco para usar o horário padrão: 17h (Horário de Brasília).</p>
                 </div>
             </div>
 
-            <!-- SELETOR DE FORMATO (CAMPO 5) -->
             <div class="space-y-3">
                 <p class="text-lg font-semibold text-gray-200">5. Escolha o Formato da Imagem de Fundo:</p>
                 <div class="flex flex-col sm:flex-row gap-4">
-                    <button id="select-16-9" data-format="16:9"
-                            class="format-button flex-1 py-3 px-6 rounded-xl border-2 border-transparent hover:border-amber-500 bg-gray-800 transition duration-300 shadow-lg">
-                        <span class="font-bold">Formato 16:9</span> <span class="text-sm text-gray-400">(Desktop / Paisagem)</span>
-                    </button>
-                    <button id="select-9-16" data-format="9:16"
-                            class="format-button flex-1 py-3 px-6 rounded-xl border-2 border-transparent hover:border-amber-500 bg-gray-800 transition duration-300 shadow-lg">
-                        <span class="font-bold">Formato 9:16</span> <span class="text-sm text-gray-400">(Celular / Retrato)</span>
-                    </button>
+                    <button id="select-16-9" data-format="16:9" class="format-button flex-1 py-3 px-6 rounded-xl border-2 border-transparent hover:border-amber-500 bg-gray-800 transition duration-300 shadow-lg"><span class="font-bold">Formato 16:9</span> <span class="text-sm text-gray-400">(Desktop / Paisagem)</span></button>
+                    <button id="select-9-16" data-format="9:16" class="format-button flex-1 py-3 px-6 rounded-xl border-2 border-transparent hover:border-amber-500 bg-gray-800 transition duration-300 shadow-lg"><span class="font-bold">Formato 9:16</span> <span class="text-sm text-gray-400">(Celular / Retrato)</span></button>
                 </div>
-                <div id="format-error" class="text-custom-yellow text-sm text-center hidden">
-                    Por favor, selecione um formato antes de prosseguir.
-                </div>
+                <div id="format-error" class="text-custom-yellow text-sm text-center hidden">Por favor, selecione um formato antes de prosseguir.</div>
             </div>
 
-            <button id="generate-invite"
-                    class="w-full py-3 bg-amber-600 hover:bg-amber-700 rounded-lg font-bold text-white shadow-xl transition duration-300 disabled:opacity-50 mt-6">
-                Gerar Convite
-            </button>
+            <button id="generate-invite" class="w-full py-3 bg-amber-600 hover:bg-amber-700 rounded-lg font-bold text-white shadow-xl transition duration-300 disabled:opacity-50 mt-6">Gerar Convite</button>
         </div>
 
-        <!-- TELA 2: Visualização do Convite Personalizado -->
-        <div id="preview-screen" class="hidden flex flex-col items-center space-y-4">
+        <!-- TELA 2: Preview -->
+        <div id="preview-screen" class="hidden flex flex-col items-center space-y-4 w-full">
             
-            <!-- Contêiner do Convite (Alvo para o html2canvas) -->
-            <div id="preview-container" class="preview-screen rounded-xl shadow-2xl relative">
+            <div id="preview-container" class="preview-screen rounded-xl relative mx-auto">
                 
-                <!-- Overlay de Conteúdo Personalizado -->
                 <div class="content-overlay">
-                    <p class="text-sm font-bold uppercase text-custom-red mb-4">CONVITE ESPECIAL</p>
+                    <p class="text-sm font-bold uppercase text-custom-red mb-1">CONVITE ESPECIAL</p>
 
-                    <!-- DADOS PERSONALIZADOS -->
-                    <!-- Nome do Convidado (Dado 1 - Vermelho) -->
-                    <h2 class="text-2xl font-extrabold mb-2 text-custom-yellow" id="display-guest-name">Olá, Convidado!</h2>
+                    <h2 class="text-2xl font-extrabold mb-1 text-custom-yellow leading-tight" id="display-guest-name">Olá, Convidado!</h2>
 
-                    <!-- Texto fixo: "Você e sua família são nossos convidados de honra para o:" -->
-                    <p class="text-sm text-custom-white mb-2">
-                        Você e sua família são nossos convidados de honra para o:
-                    </p>
+                    <p class="text-sm text-custom-white mb-1 leading-tight">Você e sua família são nossos convidados de honra para o:</p>
                     
-                    <!-- Nome do Culto (Fixo) -->
-                    <p class="text-sm font-bold text-custom-red mb-4">
-                        "Culto Internacional Trombetas e Festas 2025"
-                    </p>
+                    <p class="text-lg font-bold text-custom-red mb-2 leading-tight" id="invite-title">"Culto Internacional<br>Trombetas e Festas 2025"</p>
                     
-                    <!-- Texto Fixo da Informação do Evento -->
-                    <div class="text-sm text-gray-200 space-y-1">
-                        <!-- Linha fixa: "Será um evento de alerta..." -->
-                        <p class="text-custom-white">Será um evento de alerta para o mundo sobre os acontecimentos atuais que antecedem a volta de Jesus.</p>
+                    <div class="text-sm text-gray-200 space-y-0.5">
+                        <p class="text-custom-white leading-tight">Será um evento de alerta para o mundo sobre os acontecimentos atuais que antecedem a volta de Jesus.</p>
                         
-                        <!-- Data e Horário (Juntos para o 16:9, Separados para o 9:16) -->
                         <div id="date-time-container" class="flex justify-center flex-col sm:flex-row sm:space-x-2">
-                            <p id="display-date">Data: <span class="font-bold text-custom-white">29 de Novembro de 2025</span></p>
-                            <p id="display-time">Horário: <span class="font-bold text-custom-white">17h (Horário de Brasília)</span></p>
+                            <p id="display-date" class="leading-tight">Data: <span class="font-bold text-custom-white">29 de Novembro de 2025</span></p>
+                            <p id="display-time" class="leading-tight">Horário: <span class="font-bold text-custom-white">17h (Horário de Brasília)</span></p>
                         </div>
 
-                        <!-- Linha fixa: "Convidamos vocês para assistirem ao evento conosco na:" -->
-                        <p class="mt-2 text-custom-white">Convidamos vocês para assistirem ao evento conosco no endereço:</p>
+                        <p class="mt-1 text-custom-white leading-tight">Convidamos vocês para assistirem ao evento conosco no endereço:</p>
                         
-                        <!-- Endereço e Cidade (Dados 2 e 3 - Vermelho) -->
-                        <p class="font-bold text-custom-yellow" id="display-location">
-                            Av. General Mello, 85, Jd. Califórnia, Cuiabá - MT
-                        </p>
+                        <p class="font-bold text-custom-yellow leading-tight" id="display-location">Av. General Mello, 85, Jd. Califórnia, Cuiabá - MT</p>
                     </div>
                 </div>
 
-                <!-- Botão de Voltar (Posicionado dentro do preview-container) -->
-                <button onclick="showFormScreen()"
-                        class="absolute top-4 left-4 p-2 bg-gray-800/70 hover:bg-gray-700 rounded-full text-white transition duration-300 z-20">
-                    <!-- Icone de Seta para Esquerda (SVG) -->
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path>
-                    </svg>
+                <button onclick="showFormScreen()" class="absolute top-4 left-4 p-2 bg-gray-800/70 hover:bg-gray-700 rounded-full text-white transition duration-300 z-20">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
                 </button>
             </div>
             
-            <!-- BOTÃO DE DOWNLOAD -->
-            <button id="download-invite"
-                    class="w-full max-w-sm py-3 bg-green-600 hover:bg-green-700 rounded-lg font-bold text-white shadow-xl transition duration-300 flex items-center justify-center space-x-2">
-                <!-- Ícone de Download -->
+            <button id="download-invite" class="w-full max-w-sm py-3 bg-green-600 hover:bg-green-700 rounded-lg font-bold text-white shadow-xl transition duration-300 flex items-center justify-center space-x-2">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
                 <span>Baixar Convite</span>
             </button>
             
-            <div id="loading-message" class="text-sm text-gray-400 hidden">
-                Gerando imagem...
-            </div>
+            <div id="loading-message" class="text-sm text-gray-400 hidden">Gerando imagem...</div>
         </div>
     </div>
 
     <script>
-        // Variáveis globais para armazenar a seleção do formato e URLs das imagens
         let selectedFormat = null;
         
-        // --- CAMINHOS RELATIVOS DAS IMAGENS NO REPOSITÓRIO GITHUB ---
+        // --- LINKS DAS IMAGENS ---
         const imageUrls = {
             '16:9': './Convite 16-9.jpg', 
             '9:16': './Convite 9-16.jpg'  
         };
         
-        // Elementos do DOM
+        const htmlElement = document.documentElement;
         const formScreen = document.getElementById('form-screen');
         const previewScreen = document.getElementById('preview-screen');
         const previewContainer = document.getElementById('preview-container');
@@ -226,238 +191,218 @@
         const formatError = document.getElementById('format-error');
         const downloadButton = document.getElementById('download-invite');
         const loadingMessage = document.getElementById('loading-message');
+        const inviteTitle = document.getElementById('invite-title');
 
-        // Campos de entrada
         const guestNameInput = document.getElementById('guest-name');
         const churchAddressInput = document.getElementById('church-address');
         const churchCityInput = document.getElementById('church-city');
         const localTimeInput = document.getElementById('local-time');
 
-        // Campos de exibição
         const displayGuestName = document.getElementById('display-guest-name');
         const displayLocation = document.getElementById('display-location');
         const displayTime = document.getElementById('display-time');
-        const dateTimeContainer = document.getElementById('date-time-container');
-        
-        // --- FUNÇÕES DE LÓGICA ---
         
         /**
-         * FUNÇÃO CRÍTICA: Escala o tamanho da fonte (e, por consequência, o layout) 
-         * para que o convite seja consistente em qualquer dispositivo.
+         * FUNÇÃO PARA LER PARÂMETROS DA URL E PREENCHER OS CAMPOS
          */
-        function scaleText() {
-            // Referência de largura: A largura do contêiner de preview.
-            const containerWidth = previewContainer.offsetWidth;
-            const htmlElement = document.documentElement;
-
-            // Fator de escala: Define a fonte base do HTML. 
-            // 16px é o padrão de muitos navegadores.
-            // Aqui, usamos o containerWidth para definir o 'rem' de forma proporcional.
-            // Testes indicaram que containerWidth / 30 é um bom fator para manter o layout.
-            const scaleFactor = containerWidth / 30; 
+        function populateFieldsFromURL() {
+            const urlParams = new URLSearchParams(window.location.search);
             
-            // Define o font-size do elemento raiz (HTML) para forçar o escalonamento de todos os 'rem'
-            // O valor mínimo de 12px garante que não fique ilegível em telas minúsculas.
-            htmlElement.style.fontSize = `${Math.max(12, scaleFactor)}px`;
+            // Pega os valores dos parametros
+            const nome = urlParams.get('nome');
+            const endereco = urlParams.get('endereco');
+            const cidade = urlParams.get('cidade');
+            const horario = urlParams.get('horario');
+            const formato = urlParams.get('formato'); // Novo parametro: 16:9 ou 9:16
+
+            // Se existirem, preenche os campos
+            if (nome) guestNameInput.value = nome;
+            if (endereco) churchAddressInput.value = endereco;
+            if (cidade) churchCityInput.value = cidade;
+            if (horario) localTimeInput.value = horario;
+
+            // Seleciona o formato automaticamente
+            if (formato) {
+                // Decodifica caso venha com caracteres encoded como 16%3A9
+                const decodedFormat = decodeURIComponent(formato);
+                
+                // Encontra o botão com o data-format correspondente
+                const formatButton = document.querySelector(`.format-button[data-format="${decodedFormat}"]`);
+                
+                if (formatButton) {
+                    // Simula o clique para ativar a lógica visual e setar a variável global
+                    formatButton.click();
+                }
+            }
         }
 
-
         /**
-         * Alterna a visibilidade para a tela de formulário.
+         * FUNÇÃO DE ESCALA INTELIGENTE
          */
+        function scaleText() {
+            if (previewContainer.classList.contains('hidden') || previewContainer.offsetWidth === 0) {
+                htmlElement.style.fontSize = '';
+                return;
+            }
+
+            const containerWidth = previewContainer.offsetWidth;
+            let scaleFactor;
+
+            // Ajuste de escala para caber na altura fixa de 50%
+            if (selectedFormat === '16:9') {
+                // 16:9 precisa de fonte menor
+                scaleFactor = containerWidth / 65; 
+            } else {
+                // 9:16
+                scaleFactor = containerWidth / 35;
+            }
+            
+            htmlElement.style.fontSize = `${Math.max(1, scaleFactor)}px`;
+        }
+
         function showFormScreen() {
             previewScreen.classList.add('hidden');
             formScreen.classList.remove('hidden');
-            // Remove o escalonamento de fonte ao voltar para a tela do formulário
             document.documentElement.style.fontSize = '16px'; 
         }
 
-        /**
-         * Aplica as classes de proporção de tela no contêiner de preview.
-         * Remove todas as classes de proporção e aplica apenas a selecionada.
-         */
         function applyAspectRatioClasses(format) {
             previewContainer.classList.remove('aspect-16-9', 'aspect-9-16');
             if (format === '16:9') {
                 previewContainer.classList.add('aspect-16-9');
                 previewContainer.classList.remove('max-w-md'); 
+                previewContainer.classList.add('w-full'); 
                 previewContainer.classList.add('max-w-4xl'); 
             } else if (format === '9:16') {
                 previewContainer.classList.add('aspect-9-16');
                 previewContainer.classList.add('max-w-md'); 
                 previewContainer.classList.remove('max-w-4xl');
+                previewContainer.classList.remove('w-full'); 
             }
         }
         
-        /**
-         * Alterna a visibilidade para a tela de visualização do convite.
-         */
         function showPreviewScreen() {
             formScreen.classList.add('hidden');
-            previewScreen.classList.remove('flex');
+            previewScreen.classList.remove('hidden');
             previewScreen.classList.add('flex');
             
-            // 1. Aplica as classes de proporção antes de mostrar
             applyAspectRatioClasses(selectedFormat);
             
-            // 2. FORÇA O ESCALONAMENTO DE TEXTO BASEADO NO TAMANHO ATUAL DO CONVITE
-            // Isso corrige o bug do texto gigante no celular
-            scaleText(); 
-            
-            previewScreen.classList.remove('hidden');
+            setTimeout(scaleText, 10); 
         }
 
-        /**
-         * Trata a seleção do formato (16:9 ou 9:16).
-         * @param {Event} event - O evento de clique.
-         */
         function handleFormatSelection(event) {
-            // Remove a seleção de todos os botões
             formatButtons.forEach(btn => btn.classList.remove('bg-amber-600', 'border-amber-500'));
-            
-            // Adiciona a seleção ao botão clicado
             const clickedButton = event.currentTarget;
             selectedFormat = clickedButton.dataset.format;
             clickedButton.classList.add('bg-amber-600', 'border-amber-500');
-            
-            // Oculta a mensagem de erro
             formatError.classList.add('hidden');
         }
 
-        /**
-         * Gera o convite, aplicando os dados e o fundo e alternando a tela.
-         */
         function generateInvite() {
-            // 1. Validação do Formato
             if (!selectedFormat) {
                 formatError.classList.remove('hidden');
                 return;
             }
 
-            // 2. Coleta dos Dados (com valores padrão e formatação)
-            
-            // Dado 1: Nome do Convidado (Vermelho)
             const rawGuestName = guestNameInput.value.trim();
             const guestName = rawGuestName ? `Olá, ${rawGuestName}!` : "Olá, Convidado!"; 
             displayGuestName.textContent = guestName;
 
-            // Dados 2 e 3: Localização (Vermelho)
             const address = churchAddressInput.value.trim() || "Endereço da Igreja (Não Informado)";
             const city = churchCityInput.value.trim() || "";
             displayLocation.textContent = `${address}${city ? ', ' + city : ''}`;
 
-            // Dado 4: Horário Local (Opcional - Vermelho se for diferente do padrão)
             const localTime = localTimeInput.value.trim();
             let timeText;
-            let isCustomTime = false;
 
-            // Verifica se o valor é diferente de '17h' (case-insensitive) e não está vazio
             if (localTime && localTime.replace(/\s/g, '').toLowerCase() !== '') {
                 timeText = `${localTime} (Horário Local)`;
-                isCustomTime = true;
             } else {
                 timeText = '17h (Horário de Brasília)';
             }
 
-            // Aplica o texto e a cor condicionalmente
-            displayTime.innerHTML = `Horário: <span class="font-semibold">${timeText}</span>`;
+            displayTime.innerHTML = `Horário: <span class="font-bold text-custom-white">${timeText}</span>`;
             
-            // 3. Aplica a Imagem de Fundo
+            if (selectedFormat === '9:16') {
+                 inviteTitle.style.display = 'block'; 
+                 inviteTitle.innerHTML = '"Culto Internacional<br>Trombetas e Festas 2025"';
+            } else {
+                 inviteTitle.innerHTML = '"Culto Internacional Trombetas e Festas 2025"';
+            }
+            
             const imageUrl = imageUrls[selectedFormat];
             previewContainer.style.backgroundImage = `url('${imageUrl}')`;
 
-            // 4. Troca de Tela
             showPreviewScreen();
         }
 
-        /**
-         * Converte o DIV do convite para uma imagem PNG e inicia o download.
-         */
         async function downloadInvite() {
             loadingMessage.classList.remove('hidden');
             downloadButton.disabled = true;
-
-            // O html2canvas precisa de um momento para renderizar o DOM corretamente
             await new Promise(resolve => setTimeout(resolve, 100));
 
-            // Remove temporariamente o botão de voltar para não aparecer na imagem
             const backButton = previewContainer.querySelector('button');
             backButton.style.display = 'none';
 
             try {
-                // Remove temporariamente a sombra e o arredondamento para melhor captura do html2canvas
-                // e para remover a borda branca no PNG final.
-                previewContainer.classList.remove('shadow-2xl', 'rounded-xl');
+                // Remove sombra para evitar borda branca
+                previewContainer.style.boxShadow = 'none';
+                previewContainer.classList.remove('rounded-xl');
                 
-                // Usa html2canvas para capturar o conteúdo do div
+                // RESOLUÇÃO DE ALTA QUALIDADE
+                // Detectamos o formato e calculamos a escala para atingir 1920px (16:9) ou 1080px (9:16)
+                const targetWidth = selectedFormat === '16:9' ? 1920 : 1080;
+                const currentWidth = previewContainer.offsetWidth;
+                // Escala necessária para atingir a resolução alvo
+                const scaleFactor = targetWidth / currentWidth;
+
                 const canvas = await html2canvas(previewContainer, {
-                    // Define o fundo como NULL (transparente)
                     backgroundColor: null, 
                     useCORS: true, 
                     allowTaint: true,
-                    // Garante que a resolução seja alta para o download
-                    scale: 2 
+                    scale: scaleFactor // Usa a escala dinâmica para máxima nitidez
                 });
 
-                // Cria um link de download
                 const image = canvas.toDataURL("image/png");
                 const link = document.createElement('a');
-                
-                // Nome do arquivo de download
                 const filename = `Convite-${displayGuestName.textContent.replace(/Olá, |!|\s/g, '-')}-${selectedFormat}.png`;
                 
                 link.download = filename;
                 link.href = image;
-                
-                // Simula o clique para iniciar o download
                 link.click();
                 
             } catch (error) {
-                console.error("Erro ao gerar imagem:", error);
-                
-                const message = document.createElement('p');
-                message.textContent = "Ocorreu um erro ao tentar gerar o download da imagem. Tente novamente mais tarde. Obrigado!";
-                message.className = "text-custom-yellow mt-2";
-                previewScreen.appendChild(message);
-                
-                setTimeout(() => message.remove(), 5000); 
+                console.error("Erro:", error);
+                alert("Erro ao gerar imagem. Tente novamente.");
             } finally {
-                // Restaura o botão de voltar e oculta a mensagem de carregamento
                 backButton.style.display = 'flex'; 
-                previewContainer.classList.add('shadow-2xl', 'rounded-xl'); // Restaura as classes visuais
+                previewContainer.style.boxShadow = ''; 
+                previewContainer.classList.add('rounded-xl');
                 loadingMessage.classList.add('hidden');
                 downloadButton.disabled = false;
-                
-                // RESTAURA O TAMANHO BASE DA FONTE APÓS O DOWNLOAD
-                document.documentElement.style.fontSize = '16px';
-                // E reaplica o escalonamento para a visualização na tela
                 scaleText(); 
             }
         }
 
-        // --- LISTENERS DE EVENTOS ---
-
-        // Listener para o botão de geração
         generateButton.addEventListener('click', generateInvite);
-
-        // Listener para o novo botão de download
         downloadButton.addEventListener('click', downloadInvite);
-
-        // Listeners para os botões de seleção de formato
         formatButtons.forEach(button => {
             button.addEventListener('click', handleFormatSelection);
         });
 
-        // Event listener para redimensionar a fonte se a tela mudar de tamanho
         window.addEventListener('resize', () => {
-             // Só aplica o escalonamento se estiver na tela de preview
              if (!formScreen.classList.contains('hidden')) {
                  scaleText();
              }
         });
 
+        // --- INICIALIZAÇÃO ---
+        
+        // 1. Preenche campos se houver parâmetros na URL
+        populateFieldsFromURL();
 
-        // Chamada inicial para garantir a tela de formulário no carregamento
+        // 2. Mostra o formulário
         showFormScreen(); 
         
     </script>
