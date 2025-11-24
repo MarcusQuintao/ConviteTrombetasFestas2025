@@ -64,6 +64,9 @@
         .text-custom-yellow {
             color: #FFFF00 !important;
         }
+        .text-custom-white {
+            color: #FFFFFF !important;
+        }
         /* Classes Tailwind padrão (text-2xl, etc.) em REM, mas a raiz (html font-size) será ajustada via JS */
         
     </style>
@@ -146,7 +149,7 @@
                     <h2 class="text-2xl font-extrabold mb-2 text-custom-yellow" id="display-guest-name">Olá, Convidado!</h2>
 
                     <!-- Texto fixo: "Você e sua família são nossos convidados de honra para o:" -->
-                    <p class="text-sm text-gray-300 mb-2">
+                    <p class="text-sm text-custom-white mb-2">
                         Você e sua família são nossos convidados de honra para o:
                     </p>
                     
@@ -158,16 +161,16 @@
                     <!-- Texto Fixo da Informação do Evento -->
                     <div class="text-sm text-gray-200 space-y-1">
                         <!-- Linha fixa: "Será um evento de alerta..." -->
-                        <p class="text-gray-400">Será um evento de alerta para o mundo sobre os acontecimentos atuais que antecedem a volta de Jesus.</p>
+                        <p class="text-custom-white">Será um evento de alerta para o mundo sobre os acontecimentos atuais que antecedem a volta de Jesus.</p>
                         
                         <!-- Data e Horário (Juntos para o 16:9, Separados para o 9:16) -->
                         <div id="date-time-container" class="flex justify-center flex-col sm:flex-row sm:space-x-2">
-                            <p id="display-date">Data: <span class="font-semibold">29 de Novembro de 2025</span></p>
-                            <p id="display-time">Horário: <span class="font-semibold">17h (Horário de Brasília)</span></p>
+                            <p id="display-date">Data: <span class="font-bold text-custom-white">29 de Novembro de 2025</span></p>
+                            <p id="display-time">Horário: <span class="font-bold text-custom-white">17h (Horário de Brasília)</span></p>
                         </div>
 
                         <!-- Linha fixa: "Convidamos vocês para assistirem ao evento conosco na:" -->
-                        <p class="mt-2 text-gray-400">Convidamos vocês para assistirem ao evento conosco no endereço:</p>
+                        <p class="mt-2 text-custom-white">Convidamos vocês para assistirem ao evento conosco no endereço:</p>
                         
                         <!-- Endereço e Cidade (Dados 2 e 3 - Vermelho) -->
                         <p class="font-bold text-custom-yellow" id="display-location">
