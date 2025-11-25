@@ -174,6 +174,12 @@
     </div>
 
     <script>
+        // ====================================================================
+        // CONFIGURAÇÃO DA PLANILHA - LINK ATUALIZADO
+        // ====================================================================
+        const GOOGLE_SCRIPT_URL = 'https://script.google.com/macros/s/AKfycbwxQs0YHpmaJcjRwcegAMHaR1MXcv_Cy_V50JA9SyMPxMrbHcN-uHI_m_NeDGdIdX4c0A/exec';
+        // ====================================================================
+
         let selectedFormat = null;
         
         // --- LINKS DAS IMAGENS ---
@@ -202,40 +208,53 @@
         const displayLocation = document.getElementById('display-location');
         const displayTime = document.getElementById('display-time');
         
+        // --- INTEGRAÇÃO COM PLANILHA ---
+        function salvarDadosNaPlanilha(dados) {
+            if (!GOOGLE_SCRIPT_URL || GOOGLE_SCRIPT_URL.includes('COLE_SUA_URL')) {
+                console.log("URL da planilha não configurada. Pulando envio.");
+                return;
+            }
+
+            fetch(GOOGLE_SCRIPT_URL, {
+                method: 'POST',
+                mode: 'no-cors', 
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(dados)
+            }).then(() => {
+                console.log("Dados enviados para a planilha com sucesso!");
+            }).catch(err => {
+                console.error("Erro ao salvar dados:", err);
+            });
+        }
+
         /**
          * FUNÇÃO PARA LER PARÂMETROS DA URL E PREENCHER OS CAMPOS
          */
         function populateFieldsFromURL() {
             const urlParams = new URLSearchParams(window.location.search);
             
-            // Pega os valores dos parametros
             const nome = urlParams.get('nome');
             const endereco = urlParams.get('endereco');
             const cidade = urlParams.get('cidade');
             const horario = urlParams.get('horario');
-            const formato = urlParams.get('formato'); // Novo parametro: 16:9 ou 9:16
+            const formato = urlParams.get('formato'); 
 
-            // Se existirem, preenche os campos
             if (nome) guestNameInput.value = nome;
             if (endereco) churchAddressInput.value = endereco;
             if (cidade) churchCityInput.value = cidade;
             if (horario) localTimeInput.value = horario;
 
-            // Seleciona o formato automaticamente
             if (formato) {
-                // Decodifica caso venha com caracteres encoded como 16%3A9
                 const decodedFormat = decodeURIComponent(formato);
-                
-                // Encontra o botão com o data-format correspondente
                 const formatButton = document.querySelector(`.format-button[data-format="${decodedFormat}"]`);
-                
                 if (formatButton) {
-                    // Simula o clique para ativar a lógica visual e setar a variável global
                     formatButton.click();
                 }
             }
 
-            // --- NOVO: Limpa a URL após a leitura para estética ---
+            // Limpa a URL para ficar "bonita"
             if (window.history.replaceState) {
                 const novaURL = window.location.protocol + "//" + window.location.host + window.location.pathname;
                 window.history.replaceState({path: novaURL}, '', novaURL);
@@ -340,6 +359,17 @@
             const imageUrl = imageUrls[selectedFormat];
             previewContainer.style.backgroundImage = `url('${imageUrl}')`;
 
+            // --- ENVIO PARA PLANILHA ---
+            const dadosParaPlanilha = {
+                nome: rawGuestName, 
+                endereco: address,
+                cidade: city,
+                horario: localTime || '17h (BRT)',
+                formato: selectedFormat
+            };
+            salvarDadosNaPlanilha(dadosParaPlanilha);
+            // ---------------------------
+
             showPreviewScreen();
         }
 
@@ -404,11 +434,7 @@
         });
 
         // --- INICIALIZAÇÃO ---
-        
-        // 1. Preenche campos se houver parâmetros na URL
         populateFieldsFromURL();
-
-        // 2. Mostra o formulário
         showFormScreen(); 
         
     </script>
